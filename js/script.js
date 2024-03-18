@@ -23,8 +23,6 @@ const divCont = document.getElementById('contgrid');
 console.log(divCont);
 
 genBtn.addEventListener('click', function () {
-    const uniNumb = new Set();
-    let resultUniq;
     // variabile reset
     divCont.innerHTML = '';
     // variabili relative alla selezione della difficoltà
@@ -34,11 +32,13 @@ genBtn.addEventListener('click', function () {
     let innerOptVal = parseInt(valueSel.value);
     // ciclo per inserire le celle di gioco all'interno del contenitore principale e i numeri all'interno delle celle
     resultUniq = getRandUniqNumb(innerOptVal, 16);
+    console.log(typeof (resultUniq));
     for (let x = 0; x < innerOptVal; x++) {
         let newPlayCells = createNewCell(x + 1);
         const textCells = document.createElement('p');
         let numbers = x + 1;
-        textCells.className = ('number')
+        console.log(numbers);
+        textCells.className = ('number');
         newPlayCells.append(textCells);
         textCells.append(numbers);
         // se il valore di difficoltà selezionato è ....
@@ -51,8 +51,8 @@ genBtn.addEventListener('click', function () {
         } else {
             newPlayCells.classList.add('cell-size49');
         }
-        newPlayCells.addEventListener('click', function () {
-            if (number === uniNumb) {
+        newPlayCells.addEventListener('click', function (numbers, resultUniq) {
+            if (divNum(x + 1)) {
                 newPlayCells.classList.add('press');
             } else {
                 textCells.classList.add('d-none');
@@ -61,14 +61,20 @@ genBtn.addEventListener('click', function () {
         });
 
     }
+    
     // funzione per la divisione x 3, 5 e 15
     function divNum(number) {
-        if (number === 0) {
+        if (number % 5 === 0) {
+            return true;
+        } else if (number % 3 === 0) {
+            return true;
+        } else if (number % 15 === 0) {
             return true;
         } else {
             return false;
         }
     }
+    
     // funzione per generare la prima cella 
     function createNewCell(element) {
         const playCells = document.createElement('div');
@@ -77,17 +83,17 @@ genBtn.addEventListener('click', function () {
         return playCells;
     }
 
-    function getRandUniqNumb (maximum, lenghtNum) {
-
+    function getRandUniqNumb(maximum, lenghtNum) {
+        const uniNumb = new Set();
+        let arrayNumb = [];
         while (uniNumb.size < lenghtNum) {
             const casualNumb = Math.floor(Math.random() * maximum) + 1;
             uniNumb.add(casualNumb);
         }
-
-        return uniNumb;
+        uniNumb.forEach(item => arrayNumb.push(item));
+        return arrayNumb;
     }
 
-    console.log(resultUniq)
 
 
 
@@ -99,5 +105,6 @@ genBtn.addEventListener('click', function () {
 
 
 
-});
+
+    });
 
