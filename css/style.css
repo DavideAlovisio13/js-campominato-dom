@@ -1,0 +1,73 @@
+/* general */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: "Josefin Sans", sans-serif;
+  overflow-y: hidden;
+}
+
+body{
+    background-color: #7FFFD4;
+}
+
+p {
+  margin-bottom: 0;
+  font-size: 1.2em;
+}
+
+nav,
+footer {
+  height: 60px;
+  width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+
+
+
+
+/* grid container */
+.grid {
+  width: 700px;
+  height: 700px;
+  margin: 30px auto;
+  
+}
+.playcell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #7FFFD4;
+  border: 3px solid white;
+  cursor: pointer;
+}
+/* utility  */
+
+.cell-size100{
+    width: calc(100% / 10);
+    height: calc(100% / 10);
+}
+.cell-size81{
+    width: calc(100% / 9);
+    height: calc(100% / 9);
+}
+.cell-size49{ 
+    width: calc(100% / 7);
+    height: calc(100% / 7);
+}
+
+.press {
+    background-color: aqua;
+}
+
+.press_none {
+    background-image: url(../img/DMW-ChainChomp.webp);
+    background-size: cover;
+}
+
