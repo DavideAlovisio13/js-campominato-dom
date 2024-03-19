@@ -23,35 +23,19 @@ const divCont = document.getElementById('contgrid');
 console.log(divCont);
 
 genBtn.addEventListener('click', function () {
-    // variabile reset
     divCont.innerHTML = '';
-    // variabili relative alla selezione della difficoltà
     let inpuSelect = document.getElementById("difficulty");
-    let indexSelect = inpuSelect.selectedIndex;
-    let valueSel = inpuSelect.options[indexSelect];
-    let innerOptVal = parseInt(valueSel.value);
-    // ciclo per inserire le celle di gioco all'interno del contenitore principale e i numeri all'interno delle celle
-    // resultUniq = getRandUniqNumb(innerOptVal, 16);
-    // console.log(typeof (resultUniq));
-    let rndNum = getRandUniqNumb(innerOptVal, 16);
-    for (let x = 0; x < innerOptVal; x++) {
+    let innerOptVal = parseInt(inpuSelect.value);
+    // let rndNum = getRandUniqNumb(innerOptVal, 16);
+    for (let x = 1; x <= innerOptVal; x++) {
         let newPlayCells = createNewCell(x + 1);
         const textCells = document.createElement('p');
-        let numbers = x + 1;
-        console.log(numbers);
-        textCells.className = ('number');
         newPlayCells.append(textCells);
+        textCells.className = ('number');
+        let numbers = + x;
         textCells.append(numbers);
-        // se il valore di difficoltà selezionato è ....
-        if (innerOptVal === 100) {
-            newPlayCells.classList.add('cell-size100');
-            // invece se ......
-        } else if (innerOptVal === 81) {
-            newPlayCells.classList.add('cell-size81');
-            // altrimenti....
-        } else {
-            newPlayCells.classList.add('cell-size49');
-        }
+
+        addClasses(innerOptVal, newPlayCells);
         newPlayCells.addEventListener('click', function (numbers) {
             if (divNum(x + 1)) {
                 newPlayCells.classList.add('press');
@@ -62,18 +46,22 @@ genBtn.addEventListener('click', function () {
         });
 
     }
-    
+
     // funzione per la divisione x 3, 5 e 15
-    function divNum(number) {
-        if (number !== rndNum.values) {
-            return true;
+    function addClasses (value, element) {
+        if (value === 100) {
+            element.classList.add('cell-size100');
+            // invece se ......
+        } else if (value === 81) {
+            element.classList.add('cell-size81');
+            // altrimenti....
         } else {
-            return false;
+            element.classList.add('cell-size49');
         }
     }
-    
+
     // funzione per generare la prima cella 
-    function createNewCell(element) {
+    function createNewCell() {
         const playCells = document.createElement('div');
         playCells.className = ('playcell opacity-transition scale');
         divCont.append(playCells);
@@ -91,5 +79,5 @@ genBtn.addEventListener('click', function () {
         return arrayNumb;
     }
 
-    });
+});
 
