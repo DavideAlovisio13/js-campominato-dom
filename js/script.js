@@ -21,64 +21,69 @@ Le validazioni e i controlli possiamo farli anche in un secondo momento.
 const genBtn = document.querySelector('.btn');
 const divCont = document.getElementById('contgrid');
 console.log(divCont);
+let gameOver = false;
+let score = 0;
 
 genBtn.addEventListener('click', function () {
     divCont.innerHTML = '';
     let inpuSelect = document.getElementById("difficulty");
     let innerOptVal = parseInt(inpuSelect.value);
-    // let rndNum = getRandUniqNumb(innerOptVal, 16);
+    let bombs = getRandUniqNumb(innerOptVal, 16)
     for (let x = 1; x <= innerOptVal; x++) {
         let newPlayCells = createNewCell(x);
-
+        console.log(x);
         addClasses(innerOptVal, newPlayCells);
-
-        newPlayCells.addEventListener('click', function (numbers) {
-            if (divNum(x + 1)) {
-                newPlayCells.classList.add('press');
-            } else {
-                textCells.classList.add('d-none');
-                newPlayCells.classList.add('press_none');
-            }
-        });
-
+        gameDynamics(newPlayCells, bombs, x);
     }
 
-    // funzione per la divisione x 3, 5 e 15
-    function addClasses (value, element) {
-        if (value === 100) {
-            element.classList.add('cell-size100');
-            // invece se ......
-        } else if (value === 81) {
-            element.classList.add('cell-size81');
-            // altrimenti....
+})
+
+function gameDynamics(square, bombs, content) {
+    square.addEventListener('click', function () {
+        if (bombs.includes(content)) {
+            square.classList.add('press_none');
         } else {
-            element.classList.add('cell-size49');
+            square.classList.add('press');
         }
+    },{ once: true });
+    return square;
+}
 
+
+function addClasses(value, element) {
+    if (value === 100) {
+        element.classList.add('cell-size100');
+        // invece se ......
+    } else if (value === 81) {
+        element.classList.add('cell-size81');
+        // altrimenti....
+    } else {
+        element.classList.add('cell-size49');
     }
 
-    // funzione per generare la prima cella 
-    function createNewCell(content) {
-        const playCells = document.createElement('div');
-        playCells.className = ('playcell opacity-transition scale');
-        divCont.append(playCells);
-        const textCells = document.createElement('p');
-        playCells.append(textCells);
-        textCells.className = ('number');
-        textCells.innerHTML = content;
-        return playCells;
-    }
+}
 
-    function getRandUniqNumb(maximum, lenghtNum) {
-        const uniNumb = new Set();
-        let arrayNumb = [];
-        while (uniNumb.size < lenghtNum) {
-            const casualNumb = Math.floor(Math.random() * maximum) + 1;
-            uniNumb.add(casualNumb);
-        }
-        uniNumb.forEach(item => arrayNumb.push(item));
-        return arrayNumb;
-    }
+// funzione per generare la prima cella 
+function createNewCell(content) {
+    const playCells = document.createElement('div');
+    playCells.className = ('playcell opacity-transition scale');
+    divCont.append(playCells);
+    const textCells = document.createElement('p');
+    playCells.append(textCells);
+    textCells.className = ('number');
+    textCells.innerHTML = content;
+    return playCells;
+}
 
-});
+function getRandUniqNumb(maximum, lenghtNum) {
+    const uniNumb = new Set();
+    let arrayNumb = [];
+    while (uniNumb.size < lenghtNum) {
+        const casualNumb = Math.floor(Math.random() * maximum) + 1;
+        uniNumb.add(casualNumb);
+    }
+    uniNumb.forEach(item => arrayNumb.push(item));
+    return arrayNumb;
+}
+
 
