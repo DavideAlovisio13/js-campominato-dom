@@ -28,14 +28,10 @@ genBtn.addEventListener('click', function () {
     let innerOptVal = parseInt(inpuSelect.value);
     // let rndNum = getRandUniqNumb(innerOptVal, 16);
     for (let x = 1; x <= innerOptVal; x++) {
-        let newPlayCells = createNewCell(x + 1);
-        const textCells = document.createElement('p');
-        newPlayCells.append(textCells);
-        textCells.className = ('number');
-        let numbers = + x;
-        textCells.append(numbers);
+        let newPlayCells = createNewCell(x);
 
         addClasses(innerOptVal, newPlayCells);
+
         newPlayCells.addEventListener('click', function (numbers) {
             if (divNum(x + 1)) {
                 newPlayCells.classList.add('press');
@@ -58,13 +54,18 @@ genBtn.addEventListener('click', function () {
         } else {
             element.classList.add('cell-size49');
         }
+
     }
 
     // funzione per generare la prima cella 
-    function createNewCell() {
+    function createNewCell(content) {
         const playCells = document.createElement('div');
         playCells.className = ('playcell opacity-transition scale');
         divCont.append(playCells);
+        const textCells = document.createElement('p');
+        playCells.append(textCells);
+        textCells.className = ('number');
+        textCells.innerHTML = content;
         return playCells;
     }
 
