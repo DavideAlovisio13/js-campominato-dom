@@ -21,10 +21,11 @@ Le validazioni e i controlli possiamo farli anche in un secondo momento.
 const genBtn = document.querySelector('.btn');
 const divCont = document.getElementById('contgrid');
 console.log(divCont);
+let score;
 let gameOver = false;
-let score = 0;
 
 genBtn.addEventListener('click', function () {
+    score = 0;
     divCont.innerHTML = '';
     let inpuSelect = document.getElementById("difficulty");
     let innerOptVal = parseInt(inpuSelect.value);
@@ -38,14 +39,28 @@ genBtn.addEventListener('click', function () {
 
 })
 
-function gameDynamics(square, bombs, content) {
+function gameDynamics(square, bombs, content, score) {
     square.addEventListener('click', function () {
+        let messUser = document.querySelector('.mex');
         if (bombs.includes(content)) {
             square.classList.add('press_none');
+            messUser.innerHTML = 'hai perso';
+            let gameOver = true;
+            let totSquare = document.querySelectorAll('.playcell');
+            for (let j = 0; j < totSquare.length; j++) {
+                if (bombs.includes(j)) {
+                    totSquare[j].classList.add('press_none');
+                    totSquare[j].classList.remove('press');
+                    console.log(totSquare);
+                }
+            }
         } else {
             square.classList.add('press');
+            score++;
+            console.log(score)
+            messUser.innerHTML = + `il tuo punteggio è  ${score} `;
         }
-    },{ once: true });
+    }, { once: true });
     return square;
 }
 
@@ -85,5 +100,4 @@ function getRandUniqNumb(maximum, lenghtNum) {
     uniNumb.forEach(item => arrayNumb.push(item));
     return arrayNumb;
 }
-
 
