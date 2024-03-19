@@ -58,7 +58,7 @@ function gameDynamics(square, bombs, content, score) {
             square.classList.add('press');
             score++;
             console.log(score)
-            messUser.innerHTML = + `il tuo punteggio è  ${score} `;
+            messUser.innerHTML ='il tuo punteggio è ' + score;
         }
     }, { once: true });
     return square;
@@ -100,4 +100,3 @@ function getRandUniqNumb(maximum, lenghtNum) {
     uniNumb.forEach(item => arrayNumb.push(item));
     return arrayNumb;
 }
-

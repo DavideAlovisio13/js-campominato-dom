@@ -47,6 +47,15 @@ footer {
   border: 3px solid white;
   cursor: pointer;
 }
+
+.mex {
+  font-size: 10em;
+  color: red;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-250%, -50%);
+}
 /* utility  */
 
 .cell-size100{
