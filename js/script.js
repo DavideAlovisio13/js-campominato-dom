@@ -31,8 +31,9 @@ genBtn.addEventListener('click', function () {
     let valueSel = inpuSelect.options[indexSelect];
     let innerOptVal = parseInt(valueSel.value);
     // ciclo per inserire le celle di gioco all'interno del contenitore principale e i numeri all'interno delle celle
-    resultUniq = getRandUniqNumb(innerOptVal, 16);
-    console.log(typeof (resultUniq));
+    // resultUniq = getRandUniqNumb(innerOptVal, 16);
+    // console.log(typeof (resultUniq));
+    let rndNum = getRandUniqNumb(innerOptVal, 16);
     for (let x = 0; x < innerOptVal; x++) {
         let newPlayCells = createNewCell(x + 1);
         const textCells = document.createElement('p');
@@ -51,7 +52,7 @@ genBtn.addEventListener('click', function () {
         } else {
             newPlayCells.classList.add('cell-size49');
         }
-        newPlayCells.addEventListener('click', function (numbers, resultUniq) {
+        newPlayCells.addEventListener('click', function (numbers) {
             if (divNum(x + 1)) {
                 newPlayCells.classList.add('press');
             } else {
@@ -64,11 +65,7 @@ genBtn.addEventListener('click', function () {
     
     // funzione per la divisione x 3, 5 e 15
     function divNum(number) {
-        if (number % 5 === 0) {
-            return true;
-        } else if (number % 3 === 0) {
-            return true;
-        } else if (number % 15 === 0) {
+        if (number !== rndNum.values) {
             return true;
         } else {
             return false;
@@ -93,18 +90,6 @@ genBtn.addEventListener('click', function () {
         uniNumb.forEach(item => arrayNumb.push(item));
         return arrayNumb;
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
     });
 
