@@ -1,82 +1,247 @@
-/* general */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* Campo Minato · stile (nessuna dipendenza esterna) */
+:root {
+    color-scheme: dark;
+    --bg: #0f172a;
+    --bg-2: #111c33;
+    --surface: #1e293b;
+    --cell: #334155;
+    --cell-hover: #475569;
+    --safe: #e2e8f0;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #22d3ee;
+    --danger: #f43f5e;
+    --ok: #4ade80;
+    --radius: 10px;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
-html {
-  scroll-behavior: smooth;
-  font-family: "Josefin Sans", sans-serif;
-  overflow-y: hidden;
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
 
-body{
-    background-color: #7FFFD4;
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: var(--text);
+    background:
+        radial-gradient(60rem 40rem at 10% -10%, rgba(34, 211, 238, .14), transparent 60%),
+        radial-gradient(50rem 40rem at 110% 10%, rgba(244, 63, 94, .12), transparent 60%),
+        var(--bg);
 }
 
-p {
-  margin-bottom: 0;
-  font-size: 1.2em;
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
 }
 
-nav,
-footer {
-  height: 60px;
-  width: 100%;
-  padding-left: 15px;
-  padding-right: 15px;
+/* ---------- Barra superiore ---------- */
+.topbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem clamp(1rem, 4vw, 2.5rem);
+    border-bottom: 1px solid rgba(148, 163, 184, .15);
+    background: rgba(15, 23, 42, .6);
+    backdrop-filter: blur(8px);
 }
 
-
-
-
-
-/* grid container */
-.grid {
-  width: 700px;
-  height: 700px;
-  margin: 30px auto;
-  
-}
-.playcell {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #7FFFD4;
-  border: 3px solid white;
-  cursor: pointer;
+.brand {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin: 0;
+    font-size: clamp(1.25rem, 3vw, 1.6rem);
+    letter-spacing: -.02em;
 }
 
-.mex {
-  font-size: 10em;
-  color: red;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-250%, -50%);
-}
-/* utility  */
-
-.cell-size100{
-    width: calc(100% / 10);
-    height: calc(100% / 10);
-}
-.cell-size81{
-    width: calc(100% / 9);
-    height: calc(100% / 9);
-}
-.cell-size49{ 
-    width: calc(100% / 7);
-    height: calc(100% / 7);
+.controls {
+    display: flex;
+    gap: .6rem;
+    flex-wrap: wrap;
 }
 
-.press {
-    background-color: aqua;
+select,
+.btn {
+    font: inherit;
+    font-size: .95rem;
+    border-radius: 999px;
+    padding: .6rem 1.1rem;
+    border: 1px solid rgba(148, 163, 184, .3);
+    color: var(--text);
+    background: var(--surface);
 }
 
-.press_none {
-    background-image: url(../img/DMW-ChainChomp.webp);
-    background-size: cover;
+.btn {
+    cursor: pointer;
+    font-weight: 600;
+    color: #0f172a;
+    border-color: transparent;
+    background: linear-gradient(135deg, var(--accent), #818cf8);
+    transition: transform .15s ease, box-shadow .15s ease;
 }
 
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px -12px var(--accent);
+}
+
+select:focus-visible,
+.btn:focus-visible,
+.cell:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* ---------- Area di gioco ---------- */
+.board-wrap {
+    flex: 1;
+    /* la griglia deve stare tutta nello schermo anche in altezza */
+    width: min(100% - 2rem, 34rem, 100svh - 13rem);
+    min-width: min(100% - 2rem, 18rem);
+    margin: clamp(1rem, 4vw, 2.5rem) auto;
+    display: grid;
+    gap: 1rem;
+}
+
+.hud {
+    display: flex;
+    justify-content: space-between;
+    gap: .5rem;
+    padding: .75rem 1rem;
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--muted);
+    font-size: .9rem;
+}
+
+.hud strong {
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    margin-left: .3rem;
+}
+
+.board {
+    --side: 10;
+    display: grid;
+    grid-template-columns: repeat(var(--side), 1fr);
+    grid-template-rows: repeat(var(--side), 1fr);
+    gap: clamp(3px, .8vw, 6px);
+    padding: clamp(6px, 1.6vw, 12px);
+    aspect-ratio: 1;
+    border-radius: calc(var(--radius) + 4px);
+    background: var(--bg-2);
+    box-shadow: 0 30px 60px -30px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(148, 163, 184, .12);
+}
+
+.cell {
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font: 700 clamp(.85rem, 3.4vw, 1.25rem)/1 system-ui, sans-serif;
+    color: var(--bg);
+    background: var(--cell);
+    box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .25);
+    transition: background .12s ease, transform .12s ease;
+}
+
+.cell:hover:not(:disabled) {
+    background: var(--cell-hover);
+    transform: translateY(-1px);
+}
+
+.cell:disabled {
+    cursor: default;
+}
+
+.cell.is-safe {
+    background: var(--safe);
+    box-shadow: none;
+    animation: pop .25s ease;
+}
+
+/* Colori dei numeri come nel Campo Minato classico */
+.cell[data-near="1"] { color: #2563eb; }
+.cell[data-near="2"] { color: #16a34a; }
+.cell[data-near="3"] { color: #dc2626; }
+.cell[data-near="4"] { color: #7c3aed; }
+.cell[data-near="5"],
+.cell[data-near="6"],
+.cell[data-near="7"],
+.cell[data-near="8"] { color: #b45309; }
+
+.cell.is-bomb {
+    background: var(--cell) url("../img/bomb.svg") center / 62% no-repeat;
+}
+
+.cell.is-exploded {
+    background-color: var(--danger);
+    animation: shake .4s ease;
+}
+
+.board.is-over .cell:not(.is-safe):not(.is-bomb) {
+    opacity: .55;
+}
+
+.message {
+    margin: 0;
+    min-height: 1.5em;
+    text-align: center;
+    color: var(--muted);
+}
+
+.message.is-lose {
+    color: var(--danger);
+    font-weight: 700;
+}
+
+.message.is-win {
+    color: var(--ok);
+    font-weight: 700;
+}
+
+.footer {
+    padding: 1rem;
+    text-align: center;
+    font-size: .85rem;
+    color: var(--muted);
+}
+
+@keyframes pop {
+    from { transform: scale(.85); }
+    to { transform: scale(1); }
+}
+
+@keyframes shake {
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+@media (max-width: 30rem) {
+    .hud {
+        flex-direction: column;
+        align-items: center;
+    }
+}

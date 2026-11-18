@@ -1,102 +1,147 @@
-/*
-Consegna
-Copiamo la griglia fatta ieri nella nuova repo e aggiungiamo la logica del gioco (attenzione: non bisogna copiare tutta la cartella dell'esercizio ma solo l'index.html, e le cartelle js/ css/ con i relativi script e fogli di stile, per evitare problemi con l'inizializzazione di git).
-Il computer deve generare 16 numeri casuali nello stesso range della difficoltà prescelta: le bombe. Attenzione: **nella stessa cella può essere posizionata al massimo una bomba, perciò nell’array delle bombe non potranno esserci due numeri uguali.
-In seguito l'utente clicca su una cella: se il numero è presente nella lista dei numeri generati - abbiamo calpestato una bomba - la cella si colora di rosso e la partita termina. Altrimenti la cella cliccata si colora di azzurro e l'utente può continuare a cliccare sulle altre celle.
-La partita termina quando il giocatore clicca su una bomba o quando raggiunge il numero massimo possibile di numeri consentiti (ovvero quando ha rivelato tutte le celle che non sono bombe).
-Al termine della partita il software deve comunicare il punteggio, cioè il numero di volte che l’utente ha cliccato su una cella che non era una bomba.
-BONUS:
-Aggiungere una select accanto al bottone di generazione, che fornisca una scelta tra tre diversi livelli di difficoltà:
-difficoltà 1 ⇒ 100 caselle, con un numero compreso tra 1 e 100, divise in 10 caselle per 10 righe;
-difficoltà 2 ⇒ 81 caselle, con un numero compreso tra 1 e 81, divise in 9 caselle per 9 righe;
-difficoltà 3 ⇒ 49 caselle, con un numero compreso tra 1 e 49, divise in 7 caselle per 7 righe;
-Consigli del giorno:
-Scriviamo prima cosa vogliamo fare passo passo in italiano, dividiamo il lavoro in micro problemi.
-Ad esempio:
-Di cosa ho bisogno per generare i numeri? Proviamo sempre prima con dei console.log() per capire se stiamo ricevendo i dati giusti.
-Le validazioni e i controlli possiamo farli anche in un secondo momento.
-*/
+'use strict';
 
-// dichiaro le variabili che mi interessano...
-const genBtn = document.querySelector('.btn');
-const divCont = document.getElementById('contgrid');
-console.log(divCont);
-let score;
-let gameOver = false;
+/**
+ * Campo Minato in JavaScript puro.
+ *
+ * Regole (dalla consegna originale):
+ * - 16 bombe in posizioni uniche, su una griglia di 100, 81 o 49 celle;
+ * - cliccando una bomba la partita termina e si rivelano tutte le bombe;
+ * - cliccando una cella sicura il punteggio sale di 1;
+ * - si vince quando sono state rivelate tutte le celle senza bomba.
+ * In più: ogni cella sicura mostra quante bombe ha intorno.
+ */
 
-genBtn.addEventListener('click', function () {
-    score = 0;
-    divCont.innerHTML = '';
-    let inpuSelect = document.getElementById("difficulty");
-    let innerOptVal = parseInt(inpuSelect.value);
-    let bombs = getRandUniqNumb(innerOptVal, 16)
-    for (let x = 1; x <= innerOptVal; x++) {
-        let newPlayCells = createNewCell(x);
-        console.log(x);
-        addClasses(innerOptVal, newPlayCells);
-        gameDynamics(newPlayCells, bombs, x);
+const BOMB_COUNT = 16;
+
+const els = {
+    form: document.getElementById('controls'),
+    select: document.getElementById('difficulty'),
+    board: document.getElementById('board'),
+    score: document.getElementById('score'),
+    left: document.getElementById('left'),
+    bombs: document.getElementById('bombs'),
+    message: document.getElementById('message'),
+};
+
+let state = null;
+
+/** Restituisce `count` numeri unici casuali tra 0 e `max - 1`. */
+function uniqueRandomIndexes(max, count) {
+    const picked = new Set();
+    while (picked.size < count) {
+        picked.add(Math.floor(Math.random() * max));
     }
+    return picked;
+}
 
-})
-
-function gameDynamics(square, bombs, content, score) {
-    square.addEventListener('click', function () {
-        let messUser = document.querySelector('.mex');
-        if (bombs.includes(content)) {
-            square.classList.add('press_none');
-            messUser.innerHTML = 'hai perso';
-            let gameOver = true;
-            let totSquare = document.querySelectorAll('.playcell');
-            for (let j = 0; j < totSquare.length; j++) {
-                if (bombs.includes(j)) {
-                    totSquare[j].classList.add('press_none');
-                    totSquare[j].classList.remove('press');
-                    console.log(totSquare);
-                }
-            }
-        } else {
-            square.classList.add('press');
-            score++;
-            console.log(score)
-            messUser.innerHTML ='il tuo punteggio è ' + score;
+/** Indici delle celle confinanti (anche in diagonale) con la cella `index`. */
+function neighbours(index, side) {
+    const row = Math.floor(index / side);
+    const col = index % side;
+    const result = [];
+    for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) {
+            if (dr === 0 && dc === 0) continue;
+            const r = row + dr;
+            const c = col + dc;
+            if (r >= 0 && r < side && c >= 0 && c < side) result.push(r * side + c);
         }
-    }, { once: true });
-    return square;
+    }
+    return result;
 }
 
+function newGame(total) {
+    const side = Math.sqrt(total);
+    state = {
+        total,
+        side,
+        bombs: uniqueRandomIndexes(total, BOMB_COUNT),
+        revealed: new Set(),
+        score: 0,
+        over: false,
+    };
 
-function addClasses(value, element) {
-    if (value === 100) {
-        element.classList.add('cell-size100');
-        // invece se ......
-    } else if (value === 81) {
-        element.classList.add('cell-size81');
-        // altrimenti....
-    } else {
-        element.classList.add('cell-size49');
+    els.board.replaceChildren();
+    els.board.style.setProperty('--side', side);
+    els.board.classList.remove('is-over');
+
+    for (let i = 0; i < total; i++) {
+        const cell = document.createElement('button');
+        cell.type = 'button';
+        cell.className = 'cell';
+        cell.dataset.index = String(i);
+        cell.setAttribute('aria-label', `Cella ${i + 1}`);
+        els.board.append(cell);
     }
 
+    els.bombs.textContent = String(BOMB_COUNT);
+    els.message.textContent = 'Trova tutte le celle sicure. Buona fortuna!';
+    els.message.className = 'message';
+    render();
 }
 
-// funzione per generare la prima cella 
-function createNewCell(content) {
-    const playCells = document.createElement('div');
-    playCells.className = ('playcell opacity-transition scale');
-    divCont.append(playCells);
-    const textCells = document.createElement('p');
-    playCells.append(textCells);
-    textCells.className = ('number');
-    textCells.innerHTML = content;
-    return playCells;
-}
+function reveal(index) {
+    if (state.over || state.revealed.has(index)) return;
 
-function getRandUniqNumb(maximum, lenghtNum) {
-    const uniNumb = new Set();
-    let arrayNumb = [];
-    while (uniNumb.size < lenghtNum) {
-        const casualNumb = Math.floor(Math.random() * maximum) + 1;
-        uniNumb.add(casualNumb);
+    const cell = els.board.children[index];
+
+    if (state.bombs.has(index)) {
+        state.over = true;
+        cell.classList.add('is-exploded');
+        revealAllBombs();
+        finish(`Boom! Hai perso. Punteggio finale: ${state.score}.`, 'lose');
+        return;
     }
-    uniNumb.forEach(item => arrayNumb.push(item));
-    return arrayNumb;
+
+    state.revealed.add(index);
+    state.score++;
+    const near = neighbours(index, state.side).filter((n) => state.bombs.has(n)).length;
+    cell.classList.add('is-safe');
+    cell.disabled = true;
+    if (near > 0) {
+        cell.textContent = String(near);
+        cell.dataset.near = String(near);
+    }
+    cell.setAttribute('aria-label', near > 0 ? `${near} bombe vicine` : 'Nessuna bomba vicina');
+
+    if (state.revealed.size === state.total - BOMB_COUNT) {
+        state.over = true;
+        revealAllBombs();
+        finish(`Hai vinto! Tutte le ${state.score} celle sicure sono state trovate.`, 'win');
+        return;
+    }
+    render();
 }
+
+function revealAllBombs() {
+    state.bombs.forEach((i) => {
+        const cell = els.board.children[i];
+        cell.classList.add('is-bomb');
+        cell.setAttribute('aria-label', 'Bomba');
+    });
+    Array.from(els.board.children).forEach((cell) => { cell.disabled = true; });
+}
+
+function finish(text, outcome) {
+    els.board.classList.add('is-over');
+    els.message.textContent = text;
+    els.message.className = `message is-${outcome}`;
+    render();
+}
+
+function render() {
+    els.score.textContent = String(state.score);
+    els.left.textContent = String(state.total - BOMB_COUNT - state.revealed.size);
+}
+
+els.form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    newGame(parseInt(els.select.value, 10));
+});
+
+els.board.addEventListener('click', (event) => {
+    const cell = event.target.closest('.cell');
+    if (cell) reveal(parseInt(cell.dataset.index, 10));
+});
+
+newGame(parseInt(els.select.value, 10));
